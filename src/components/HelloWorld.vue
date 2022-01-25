@@ -1,47 +1,84 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-typescript" target="_blank" rel="noopener">typescript</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div class="flex flex-col gap-2">
+    <div>
+      <input
+        class="border-blue-600 border-2 input rounded-md p-2 w-2/6"
+        type="string"
+        v-model="input"
+        placeholder="Add new todo"
+        v-on:keyup.enter="submitInput()"
+      />
+    </div>
+    <button class="btn btn-blue w-24 self-center" @click="submitInput()">
+      Submit
+    </button>
+    <div class="mx-auto flex flex-col gap-2 w-2/4">
+      <todo-component
+        v-for="todo in todos"
+        v-bind:key="todo.id"
+        v-bind:todoProp="todo"
+        @deleteTodo="deleteTodo($event)"
+      ></todo-component>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Todo } from "@/models/todo";
+import { Component, Prop, Vue } from "vue-property-decorator";
+import TodoComponent from "./Todo.vue";
 
-@Component
+@Component({
+  components: {
+    TodoComponent: TodoComponent,
+  },
+})
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
+  input: string = "Test";
+  todos: Todo[] = [];
+
+  submitInput(): void {
+    if (!this.input) {
+      return;
+    }
+    let lastTodoSlice = this.todos.slice(-1);
+    let lastTodoId = lastTodoSlice.length > 0 ? lastTodoSlice[0].id : 0;
+
+    let newTodo: Todo = {
+      id: ++lastTodoId,
+      text: this.input,
+      isDone: false,
+    } as Todo;
+    this.todos.push(newTodo);
+    console.log(this.todos);
+    this.input = "";
+  }
+
+  deleteTodo(id: number): void {
+    this.todos = this.todos.filter((todo) => todo.id !== id);
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.btn {
+  @apply font-bold py-2 px-4 rounded;
+}
+.btn-blue {
+  @apply bg-blue-500 text-white;
+  &:hover {
+    @apply bg-blue-700;
+  }
+}
+
+input {
+  &:focus {
+    @apply outline-none border-blue-300 border-2;
+  }
+}
+
 h3 {
   margin: 40px 0 0;
 }
