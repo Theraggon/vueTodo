@@ -18,6 +18,7 @@
         v-bind:key="todo.id"
         v-bind:todoProp="todo"
         @deleteTodo="deleteTodo($event)"
+        @todoChange="todoChange($event)"
       ></todo-component>
     </div>
   </div>
@@ -25,7 +26,7 @@
 
 <script lang="ts">
 import { Todo } from "@/models/todo";
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import TodoComponent from "./Todo.vue";
 
 @Component({
@@ -34,34 +35,54 @@ import TodoComponent from "./Todo.vue";
   },
 })
 export default class HelloWorld extends Vue {
-  @Prop() private msg!: string;
-  input: string = "Test";
+  input: string = "";
   todos: Todo[] = [];
+
+  mounted(): void {
+    if (localStorage.todos) {
+      this.todos = JSON.parse(localStorage.todos) as Todo[];
+    }
+  }
+
+  @Watch("todos")
+  onPropertyChanged(value: Todo[]): void {
+    this.writeTodosToLocalStorage(value);
+  }
 
   submitInput(): void {
     if (!this.input) {
       return;
     }
-    let lastTodoSlice = this.todos.slice(-1);
-    let lastTodoId = lastTodoSlice.length > 0 ? lastTodoSlice[0].id : 0;
+
+    let nextId = ([...this.todos].pop()?.id ?? 0) + 1;
 
     let newTodo: Todo = {
-      id: ++lastTodoId,
+      id: nextId,
       text: this.input,
       isDone: false,
     } as Todo;
-    this.todos.push(newTodo);
-    console.log(this.todos);
+
+    this.todos = this.todos.concat(newTodo);
+
     this.input = "";
   }
 
   deleteTodo(id: number): void {
     this.todos = this.todos.filter((todo) => todo.id !== id);
   }
+
+  todoChange(changedTodo: Todo): void {
+    this.todos = this.todos.map((todo) =>
+      todo.id === changedTodo.id ? changedTodo : todo
+    );
+  }
+
+  writeTodosToLocalStorage(todos: Todo[]): void {
+    localStorage.todos = JSON.stringify(todos);
+  }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .btn {
   @apply font-bold py-2 px-4 rounded;
@@ -77,20 +98,5 @@ input {
   &:focus {
     @apply outline-none border-blue-300 border-2;
   }
-}
-
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
 }
 </style>

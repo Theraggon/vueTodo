@@ -1,6 +1,11 @@
 <template>
   <div class="flex flex-row justify-start bg-gray-100 rounded-md p-2">
-    <input class="checkbox" type="checkbox" v-model="todo.isDone" />
+    <input
+      class="checkbox"
+      type="checkbox"
+      v-model="todo.isDone"
+      @click="todoChange()"
+    />
     <span
       class="border-b-2 border-blue-600 border-solid flex-1 text-left p-1 my-auto text-3xl"
       :class="{ isDone: todo.isDone }"
@@ -35,16 +40,13 @@ export default class TodoComponent extends Vue {
   @Prop({ required: true, type: Object as PropType<Todo> }) todoProp!: Todo;
   todo: Todo = this.todoProp;
 
-  beforeMount(): void {
-    //this.todo = this.todoProp;
-  }
-
-  toggleDone(): void {
-    this.todo.isDone = !!this.todo.isDone;
-  }
-
   deleteTodo(): void {
     this.$emit("deleteTodo", this.todo.id);
+  }
+
+  todoChange(): void {
+    this.todo.isDone = !this.todo.isDone;
+    this.$emit("todoChange", this.todo);
   }
 }
 </script>
