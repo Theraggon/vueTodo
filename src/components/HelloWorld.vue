@@ -1,17 +1,17 @@
 <template>
   <div class="flex flex-col gap-2">
-    <div>
+    <div class="flex justify-center gap-2">
       <input
-        class="border-blue-600 border-2 input rounded-md p-2 w-2/6"
+        class="border-blue-600 border-2 input rounded-md p-3 w-2/6"
         type="string"
         v-model="input"
         placeholder="Add new todo"
-        v-on:keyup.enter="submitInput()"
+        v-on:keyup.enter="addTodo()"
       />
+      <button class="btn btn-blue w-24 self-center" @click="addTodo()">
+        Add
+      </button>
     </div>
-    <button class="btn btn-blue w-24 self-center" @click="submitInput()">
-      Submit
-    </button>
     <div class="mx-auto flex flex-col gap-2 w-2/4">
       <todo-component
         v-for="todo in todos"
@@ -49,7 +49,7 @@ export default class HelloWorld extends Vue {
     this.writeTodosToLocalStorage(value);
   }
 
-  submitInput(): void {
+  addTodo(): void {
     if (!this.input) {
       return;
     }
