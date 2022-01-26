@@ -7,7 +7,7 @@
       @click="todoChange()"
     />
     <span
-      class="border-b-2 border-blue-600 border-solid flex-1 text-left p-1 my-auto text-3xl"
+      class="border-b-2 border-blue-600 border-solid flex-1 text-left p-1 my-auto text-3xl break-words-custom"
       :class="{ isDone: todo.isDone }"
     >
       {{ todo.text }}
@@ -63,5 +63,9 @@ export default class TodoComponent extends Vue {
   :focus {
     @apply outline-none;
   }
+}
+
+.break-words-custom {
+  word-break: break-word;
 }
 </style>
