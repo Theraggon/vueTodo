@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-2">
     <div class="flex justify-center gap-2">
       <input
-        class="border-blue-600 border-2 input rounded-md p-3 w-2/6"
+        class="border-blue-600 border-2 input rounded-md p-3 md:w-2/6"
         type="string"
         v-model="input"
         placeholder="Add new todo"
@@ -12,7 +12,7 @@
         Add
       </button>
     </div>
-    <div class="mx-auto flex flex-col gap-2 w-2/4">
+    <div class="mx-auto flex flex-col gap-2 p-2 md:w-2/4">
       <todo-component
         v-for="todo in todos"
         v-bind:key="todo.id"
