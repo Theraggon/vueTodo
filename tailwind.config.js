@@ -4,17 +4,26 @@ module.exports = {
   theme: {
     extend: {
       keyframes: {
-          wiggle: {
-              '0%, 100%': {
-                  transform: 'rotate(-3deg)'
-              },
-              '50%': {
-                  transform: 'rotate(3deg)'
-              },
-          }
+        "wiggle-small": {
+          '0%, 100%': {
+            transform: 'rotate(-1deg)'
+        },
+        '50%': {
+            transform: 'rotate(1deg)'
+        },
+        },
+        wiggle: {
+            '0%, 100%': {
+                transform: 'rotate(-3deg)'
+            },
+            '50%': {
+                transform: 'rotate(3deg)'
+            },
+        }
       },
       animation: {
           wiggle: 'wiggle 0.2s ease-in-out',
+          "wiggle-small": 'wiggle-small 0.2s ease-in-out',
       }
     },
   },

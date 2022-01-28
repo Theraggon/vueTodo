@@ -6,25 +6,31 @@
         type="string"
         v-model="input"
         placeholder="Add new todo"
-        v-on:keyup.enter="addTodo()"
+        v-on:keyup.enter="addTodo($event, 'input')"
+        v-on:animationend="
+          ($event) => $event.target.classList.remove('animate-wiggle-small')
+        "
       />
       <button
         class="btn btn-blue w-24 self-center"
-        :class="wrongInput && 'animate-wiggle'"
-        v-on:animationend="resetWrongInput()"
-        @click="addTodo()"
+        v-on:animationend="
+          ($event) => $event.target.classList.remove('animate-wiggle')
+        "
+        @click="addTodo($event, 'button')"
       >
         Add
       </button>
     </div>
-    <div class="mx-auto flex flex-col gap-2 p-2 md:w-2/4">
-      <todo-component
-        v-for="todo in todos"
-        v-bind:key="todo.id"
-        v-bind:todoProp="todo"
-        @deleteTodo="deleteTodo($event)"
-        @todoChange="todoChange($event)"
-      ></todo-component>
+    <div class="mx-auto md:w-2/4">
+      <transition-group name="list" tag="p" class="flex flex-col gap-2 p-2">
+        <todo-component
+          v-for="todo in todos"
+          v-bind:key="todo.id"
+          v-bind:todoProp="todo"
+          @deleteTodo="deleteTodo($event)"
+          @todoChange="todoChange($event)"
+        ></todo-component>
+      </transition-group>
     </div>
   </div>
 </template>
@@ -43,12 +49,6 @@ export default class HelloWorld extends Vue {
   input: string = "";
   todos: Todo[] = [];
 
-  wrongInput = false;
-
-  resetWrongInput(): void {
-    this.wrongInput = false;
-  }
-
   mounted(): void {
     if (localStorage.todos) {
       this.todos = JSON.parse(localStorage.todos) as Todo[];
@@ -60,9 +60,9 @@ export default class HelloWorld extends Vue {
     this.writeTodosToLocalStorage(value);
   }
 
-  addTodo(): void {
+  addTodo(event: Event, caller: string): void {
     if (!this.input) {
-      this.wrongInput = true;
+      this.animateFailure(caller, event);
       return;
     }
 
@@ -77,6 +77,15 @@ export default class HelloWorld extends Vue {
     this.todos = this.todos.concat(newTodo);
 
     this.input = "";
+  }
+
+  private animateFailure(caller: string, event: Event) {
+    if (caller === "button") {
+      (event.target as HTMLButtonElement).classList.add("animate-wiggle");
+    }
+    if (caller === "input") {
+      (event.target as HTMLInputElement).classList.add("animate-wiggle-small");
+    }
   }
 
   deleteTodo(id: number): void {
@@ -96,6 +105,14 @@ export default class HelloWorld extends Vue {
 </script>
 
 <style scoped lang="scss">
+.list-enter-active,
+.list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateX(-30px);
+}
 .btn {
   @apply font-bold py-2 px-4 rounded;
 }
