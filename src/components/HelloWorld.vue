@@ -8,7 +8,12 @@
         placeholder="Add new todo"
         v-on:keyup.enter="addTodo()"
       />
-      <button class="btn btn-blue w-24 self-center" @click="addTodo()">
+      <button
+        class="btn btn-blue w-24 self-center"
+        :class="wrongInput && 'animate-wiggle'"
+        v-on:animationend="resetWrongInput()"
+        @click="addTodo()"
+      >
         Add
       </button>
     </div>
@@ -38,6 +43,12 @@ export default class HelloWorld extends Vue {
   input: string = "";
   todos: Todo[] = [];
 
+  wrongInput = false;
+
+  resetWrongInput(): void {
+    this.wrongInput = false;
+  }
+
   mounted(): void {
     if (localStorage.todos) {
       this.todos = JSON.parse(localStorage.todos) as Todo[];
@@ -51,6 +62,7 @@ export default class HelloWorld extends Vue {
 
   addTodo(): void {
     if (!this.input) {
+      this.wrongInput = true;
       return;
     }
 
